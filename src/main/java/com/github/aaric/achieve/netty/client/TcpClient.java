@@ -10,7 +10,8 @@ import io.netty.handler.codec.string.StringEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetSocketAddress;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * TcpClient
@@ -18,7 +19,7 @@ import java.net.InetSocketAddress;
  * @author Aaric, created on 2018-05-02T10:19.
  * @since 0.1.0-SNAPSHOT
  */
-public class TcpClient {
+public class TcpClient implements Runnable {
 
     /**
      * Logger
@@ -26,20 +27,49 @@ public class TcpClient {
     private static final Logger logger = LoggerFactory.getLogger(TcpClient.class);
 
     /**
-     * Main
-     *
-     * @param args
+     * 缓存客户端连接
      */
-    public static void main(String[] args) {
+    private static Map<String, Channel> clientMap = new ConcurrentHashMap<>();
+
+    /**
+     * 连接服务主机地址
+     */
+    private String serverHost;
+
+    /**
+     * 连接服务端口
+     */
+    private int serverPort;
+
+    /**
+     * 创建最大客户端总数
+     */
+    private int clientCount;
+
+    /**
+     * 构造函数
+     *
+     * @param serverHost  连接服务主机地址
+     * @param serverPort  连接服务端口
+     * @param clientCount 创建最大客户端总数
+     */
+    public TcpClient(String serverHost, int serverPort, int clientCount) {
+        this.serverHost = serverHost;
+        this.serverPort = serverPort;
+        this.clientCount = clientCount;
+    }
+
+    @Override
+    public void run() {
         // worker负责读写数据
-        EventLoopGroup worker = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
 
         try {
             // 辅助启动类
             Bootstrap bootstrap = new Bootstrap();
 
             // 设置线程池
-            bootstrap.group(worker);
+            bootstrap.group(workerGroup);
 
             // 设置socket工厂
             bootstrap.channel(NioSocketChannel.class);
@@ -63,15 +93,31 @@ public class TcpClient {
                 }
             });
 
+            // 设置TCP参数
+            bootstrap.option(ChannelOption.SO_KEEPALIVE, true); //维持连接的活跃，清除死连接
+            bootstrap.option(ChannelOption.TCP_NODELAY, true); //关闭延迟发送
+
             // 发起异步连接操作
-            ChannelFuture future = bootstrap.connect(new InetSocketAddress("127.0.0.1", 7777)).sync();
+            ChannelFuture future;
+            for (int i = 0; i < clientCount; i++) {
+                // 发起异步连接操作
+                future = bootstrap.connect(serverHost, serverPort).sync();
+
+                // 缓存客户端连接
+                clientMap.put(future.channel().id().asLongText(), future.channel());
+            }
 
             // 等待客户端链路关闭
-            future.channel().closeFuture().sync();
+            for (Map.Entry<String, Channel> channelEntry : clientMap.entrySet()) {
+                channelEntry.getValue().closeFuture().sync();
+            }
+
         } catch (Exception e) {
             logger.error("main, {}", e);
+        } finally {
+            // 优雅退出
+            workerGroup.shutdownGracefully();
         }
-
     }
 
     /**
@@ -134,5 +180,15 @@ public class TcpClient {
             // 打印异常
             logger.error("exceptionCaught, {}", cause);
         }
+    }
+
+    /**
+     * Main
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+        TcpClient client = new TcpClient("127.0.0.1", 7777, 20);
+        client.run();
     }
 }
