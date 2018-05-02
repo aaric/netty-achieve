@@ -10,7 +10,7 @@
     </Appenders>
     <Loggers>
         <Logger name="com.github.aaric" level="DEBUG"/>
-        <Root level="INFO">
+        <Root level="DEBUG">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="LogFile"/>
         </Root>
