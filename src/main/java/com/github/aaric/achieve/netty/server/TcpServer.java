@@ -24,24 +24,24 @@ public class TcpServer implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(TcpServer.class);
 
     /**
-     * 服务绑定端口
+     * 绑定端口
      */
     private int serverPort;
 
     /**
      * 最大连接数
      */
-    private int maxClient;
+    private int maxClientTotal;
 
     /**
      * 构造函数
      *
-     * @param serverPort 服务绑定端口
-     * @param maxClient  最大连接数
+     * @param serverPort     绑定端口
+     * @param maxClientTotal 最大连接数
      */
-    public TcpServer(int serverPort, int maxClient) {
+    public TcpServer(int serverPort, int maxClientTotal) {
         this.serverPort = serverPort;
-        this.maxClient = maxClient;
+        this.maxClientTotal = maxClientTotal;
     }
 
     @Override
@@ -80,7 +80,7 @@ public class TcpServer implements Runnable {
             });
 
             // 设置TCP参数
-            bootstrap.option(ChannelOption.SO_BACKLOG, maxClient); //连接缓冲池的大小
+            bootstrap.option(ChannelOption.SO_BACKLOG, maxClientTotal); //连接缓冲池的大小
             bootstrap.childOption(ChannelOption.SO_KEEPALIVE, true); //维持连接的活跃，清除死连接
             bootstrap.childOption(ChannelOption.TCP_NODELAY, true); //关闭延迟发送
 
@@ -168,7 +168,8 @@ public class TcpServer implements Runnable {
      * @param args
      */
     public static void main(String[] args) {
-        TcpServer server = new TcpServer(7777, 1024 * 2 * 100);
-        server.run();
+        // 创建服务端
+        Thread serverThread = new Thread(new TcpServer(7777, 1024 * 2 * 100));
+        serverThread.start();
     }
 }

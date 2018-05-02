@@ -1,6 +1,7 @@
 package com.github.aaric.achieve.netty.client;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -12,6 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * TcpClient
@@ -44,19 +48,19 @@ public class TcpClient implements Runnable {
     /**
      * 创建最大客户端总数
      */
-    private int clientCount;
+    private int initClientTotal;
 
     /**
      * 构造函数
      *
-     * @param serverHost  连接服务主机地址
-     * @param serverPort  连接服务端口
-     * @param clientCount 创建最大客户端总数
+     * @param serverHost      连接服务主机地址
+     * @param serverPort      连接服务端口
+     * @param initClientTotal 创建最大客户端总数
      */
-    public TcpClient(String serverHost, int serverPort, int clientCount) {
+    public TcpClient(String serverHost, int serverPort, int initClientTotal) {
         this.serverHost = serverHost;
         this.serverPort = serverPort;
-        this.clientCount = clientCount;
+        this.initClientTotal = initClientTotal;
     }
 
     @Override
@@ -99,12 +103,14 @@ public class TcpClient implements Runnable {
 
             // 发起异步连接操作
             ChannelFuture future;
-            for (int i = 0; i < clientCount; i++) {
+            for (int i = 0; i < initClientTotal; i++) {
                 // 发起异步连接操作
                 future = bootstrap.connect(serverHost, serverPort).sync();
 
                 // 缓存客户端连接
-                clientMap.put(future.channel().id().asLongText(), future.channel());
+                if (future.isSuccess()) {
+                    clientMap.put(future.channel().id().asLongText(), future.channel());
+                }
             }
 
             // 等待客户端链路关闭
@@ -188,7 +194,33 @@ public class TcpClient implements Runnable {
      * @param args
      */
     public static void main(String[] args) {
-        TcpClient client = new TcpClient("127.0.0.1", 7777, 20);
-        client.run();
+        // 初始化客户端数目
+        int clientCount = 2000;
+
+        // 创建客户端连接
+        Thread clientThread = new Thread(new TcpClient("127.0.0.1", 7777, clientCount));
+        clientThread.start();
+
+        // 定时发送数据
+        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
+        scheduledExecutorService.scheduleAtFixedRate(() -> {
+
+            // 打印当前已经建立连接总数
+            logger.info("Current Client Total: {}", clientMap.size());
+
+            // 向服务端数据
+            if (clientCount == clientMap.size()) {
+                // 循环发送数据
+                for (Map.Entry<String, Channel> channelEntry : clientMap.entrySet()) {
+                    channelEntry.getValue()
+                            .writeAndFlush(Unpooled.copiedBuffer(channelEntry.getKey().getBytes()))
+                            .addListener(future -> {
+                                if (!future.isSuccess()) {
+                                    logger.error("{} send failure!", channelEntry.getKey());
+                                }
+                            });
+                }
+            }
+        }, 3, 1, TimeUnit.SECONDS);
     }
 }
