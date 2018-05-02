@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  * @author Aaric, created on 2018-05-02T10:19.
  * @since 0.1.0-SNAPSHOT
  */
-public class TcpServer {
+public class TcpServer implements Runnable {
 
     /**
      * Logger
@@ -24,21 +24,38 @@ public class TcpServer {
     private static final Logger logger = LoggerFactory.getLogger(TcpServer.class);
 
     /**
-     * Main
-     *
-     * @param args
+     * 绑定端口
      */
-    public static void main(String[] args) {
+    private int serverPort;
+
+    /**
+     * 最大连接数
+     */
+    private int maxClientTotal;
+
+    /**
+     * 构造函数
+     *
+     * @param serverPort     绑定端口
+     * @param maxClientTotal 最大连接数
+     */
+    public TcpServer(int serverPort, int maxClientTotal) {
+        this.serverPort = serverPort;
+        this.maxClientTotal = maxClientTotal;
+    }
+
+    @Override
+    public void run() {
         // boss线程监听端口，worker线程负责数据读写
-        EventLoopGroup boss = new NioEventLoopGroup();
-        EventLoopGroup worker = new NioEventLoopGroup();
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
 
         try {
             // 辅助启动类
             ServerBootstrap bootstrap = new ServerBootstrap();
 
             // 设置线程池
-            bootstrap.group(boss, worker);
+            bootstrap.group(bossGroup, workerGroup);
 
             // 设置socket工厂
             bootstrap.channel(NioServerSocketChannel.class);
@@ -63,12 +80,12 @@ public class TcpServer {
             });
 
             // 设置TCP参数
-            bootstrap.option(ChannelOption.SO_BACKLOG, 1024); //连接缓冲池的大小
+            bootstrap.option(ChannelOption.SO_BACKLOG, maxClientTotal); //连接缓冲池的大小
             bootstrap.childOption(ChannelOption.SO_KEEPALIVE, true); //维持连接的活跃，清除死连接
             bootstrap.childOption(ChannelOption.TCP_NODELAY, true); //关闭延迟发送
 
             // 绑定端口
-            ChannelFuture future = bootstrap.bind(7777).sync();
+            ChannelFuture future = bootstrap.bind(serverPort).sync();
             logger.info("Server start.");
 
             // 等待服务端监听端口关闭
@@ -76,6 +93,10 @@ public class TcpServer {
 
         } catch (Exception e) {
             logger.error("main, {}", e);
+        } finally {
+            // 优雅退出
+            bossGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully();
         }
     }
 
@@ -139,5 +160,16 @@ public class TcpServer {
             // 打印异常
             logger.error("exceptionCaught, {}", cause);
         }
+    }
+
+    /**
+     * Main
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+        // 创建服务端
+        Thread serverThread = new Thread(new TcpServer(7777, 1024 * 2 * 100));
+        serverThread.start();
     }
 }
