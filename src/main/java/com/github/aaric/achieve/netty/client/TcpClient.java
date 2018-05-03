@@ -1,20 +1,19 @@
 package com.github.aaric.achieve.netty.client;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
+import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -68,6 +67,21 @@ public class TcpClient implements Runnable {
         // worker负责读写数据
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
+        // 定时发送数据
+        workerGroup.scheduleAtFixedRate(() -> {
+
+            // 打印当前已经建立连接总数
+            logger.info("Current Client Total: {}", clientMap.size());
+
+            // 向服务端数据
+            if (this.initClientTotal == clientMap.size()) {
+                // 循环发送数据
+                for (Map.Entry<String, Channel> channelEntry : clientMap.entrySet()) {
+                    channelEntry.getValue().writeAndFlush(Unpooled.wrappedBuffer(channelEntry.getKey().getBytes()));
+                }
+            }
+        }, 3, 2, TimeUnit.SECONDS);
+
         try {
             // 辅助启动类
             Bootstrap bootstrap = new Bootstrap();
@@ -75,31 +89,21 @@ public class TcpClient implements Runnable {
             // 设置线程池
             bootstrap.group(workerGroup);
 
-            // 设置socket工厂
-            bootstrap.channel(NioSocketChannel.class);
-
-            // 设置管道
-            bootstrap.handler(new ChannelInitializer<SocketChannel>() {
-
-                @Override
-                protected void initChannel(SocketChannel socketChannel) throws Exception {
-                    // 获取管道
-                    ChannelPipeline pipeline = socketChannel.pipeline();
-
-                    // 字符串解码器
-                    pipeline.addLast(new StringDecoder());
-
-                    // 字符串编码器
-                    pipeline.addLast(new StringEncoder());
-
-                    // 处理类
-                    pipeline.addLast(new TcpClientChannelHandler());
-                }
-            });
-
             // 设置TCP参数
-            bootstrap.option(ChannelOption.SO_KEEPALIVE, true); //维持连接的活跃，清除死连接
-            bootstrap.option(ChannelOption.TCP_NODELAY, true); //关闭延迟发送
+            bootstrap.channel(NioSocketChannel.class) // 设置socket工厂
+                    /*.option(ChannelOption.SO_KEEPALIVE, true) //维持连接的活跃，清除死连接
+                    .option(ChannelOption.TCP_NODELAY, true)*/ //关闭延迟发送
+                    .handler(new ChannelInitializer<SocketChannel>() { // 设置管道
+
+                        @Override
+                        protected void initChannel(SocketChannel socketChannel) throws Exception {
+                            // 获取管道
+                            ChannelPipeline pipeline = socketChannel.pipeline();
+
+                            // 处理类
+                            pipeline.addLast(new TcpClientChannelHandler());
+                        }
+                    });
 
             // 发起异步连接操作
             ChannelFuture future;
@@ -129,7 +133,7 @@ public class TcpClient implements Runnable {
     /**
      * TcpClientChannelHandler
      */
-    private static class TcpClientChannelHandler extends SimpleChannelInboundHandler<String> {
+    private static class TcpClientChannelHandler extends ChannelInboundHandlerAdapter {
 
         /**
          * 接受服务端发来的数据
@@ -139,9 +143,14 @@ public class TcpClient implements Runnable {
          * @throws Exception
          */
         @Override
-        protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-            // 打印服务端接收数据
-            logger.info("Server: {}", msg);
+        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+            try {
+                // 打印服务端接收数据
+                ByteBuf buffer = (ByteBuf) msg;
+                logger.info("Server: {}", new String(ByteBufUtil.getBytes(buffer)));
+            } finally {
+                ReferenceCountUtil.release(msg);
+            }
         }
 
         /**
@@ -194,33 +203,8 @@ public class TcpClient implements Runnable {
      * @param args
      */
     public static void main(String[] args) {
-        // 初始化客户端数目
-        int clientCount = 2000;
-
         // 创建客户端连接
-        Thread clientThread = new Thread(new TcpClient("127.0.0.1", 7777, clientCount));
+        Thread clientThread = new Thread(new TcpClient("127.0.0.1", 7777, 2000));
         clientThread.start();
-
-        // 定时发送数据
-        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
-        scheduledExecutorService.scheduleAtFixedRate(() -> {
-
-            // 打印当前已经建立连接总数
-            logger.info("Current Client Total: {}", clientMap.size());
-
-            // 向服务端数据
-            if (clientCount == clientMap.size()) {
-                // 循环发送数据
-                for (Map.Entry<String, Channel> channelEntry : clientMap.entrySet()) {
-                    channelEntry.getValue()
-                            .writeAndFlush(Unpooled.copiedBuffer(channelEntry.getKey().getBytes()))
-                            .addListener(future -> {
-                                if (!future.isSuccess()) {
-                                    logger.error("{} send failure!", channelEntry.getKey());
-                                }
-                            });
-                }
-            }
-        }, 3, 1, TimeUnit.SECONDS);
     }
 }
