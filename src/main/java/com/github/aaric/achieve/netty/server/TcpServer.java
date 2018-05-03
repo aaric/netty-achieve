@@ -1,12 +1,14 @@
 package com.github.aaric.achieve.netty.server;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
+import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,19 +31,12 @@ public class TcpServer implements Runnable {
     private int serverPort;
 
     /**
-     * 最大连接数
-     */
-    private int maxClientTotal;
-
-    /**
      * 构造函数
      *
-     * @param serverPort     绑定端口
-     * @param maxClientTotal 最大连接数
+     * @param serverPort 绑定端口
      */
-    public TcpServer(int serverPort, int maxClientTotal) {
+    public TcpServer(int serverPort) {
         this.serverPort = serverPort;
-        this.maxClientTotal = maxClientTotal;
     }
 
     @Override
@@ -57,8 +52,11 @@ public class TcpServer implements Runnable {
             // 设置线程池
             bootstrap.group(bossGroup, workerGroup);
 
-            // 设置socket工厂
-            bootstrap.channel(NioServerSocketChannel.class);
+            // 设置socket工厂，并设置TCP参数
+            bootstrap.channel(NioServerSocketChannel.class)
+                    .option(ChannelOption.SO_BACKLOG, 1024) //连接缓冲池的大小
+                    .option(ChannelOption.SO_KEEPALIVE, true) //维持连接的活跃，清除死连接
+                    .option(ChannelOption.TCP_NODELAY, true); //关闭延迟发送
 
             // 设置管道工厂
             bootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
@@ -68,21 +66,10 @@ public class TcpServer implements Runnable {
                     // 获取管道
                     ChannelPipeline pipeline = socketChannel.pipeline();
 
-                    // 字符串解码器
-                    pipeline.addLast(new StringDecoder());
-
-                    // 字符串编码器
-                    pipeline.addLast(new StringEncoder());
-
                     // 处理类
                     pipeline.addLast(new TcpServerChannelHandler());
                 }
             });
-
-            // 设置TCP参数
-            bootstrap.option(ChannelOption.SO_BACKLOG, maxClientTotal); //连接缓冲池的大小
-            bootstrap.childOption(ChannelOption.SO_KEEPALIVE, true); //维持连接的活跃，清除死连接
-            bootstrap.childOption(ChannelOption.TCP_NODELAY, true); //关闭延迟发送
 
             // 绑定端口
             ChannelFuture future = bootstrap.bind(serverPort).sync();
@@ -103,7 +90,7 @@ public class TcpServer implements Runnable {
     /**
      * TcpServerHandler
      */
-    private static class TcpServerChannelHandler extends SimpleChannelInboundHandler<String> {
+    private static class TcpServerChannelHandler extends ChannelInboundHandlerAdapter {
 
         /**
          * 读取客户端发送的数据
@@ -113,12 +100,18 @@ public class TcpServer implements Runnable {
          * @throws Exception
          */
         @Override
-        protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-            // 打印服务端接收数据
-            logger.info("Client: {}", msg);
+        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+            try {
+                // 打印服务端接收数据
+                ByteBuf buffer = (ByteBuf) msg;
+                logger.info("Client: {}", new String(ByteBufUtil.getBytes(buffer)));
 
-            // 回复客户端数据
-            ctx.channel().writeAndFlush("I'm server!");
+                // 回复客户端数据
+                ctx.channel().writeAndFlush(Unpooled.wrappedBuffer("I'm server!".getBytes()));
+
+            } finally {
+                ReferenceCountUtil.release(msg);
+            }
         }
 
         /**
@@ -158,7 +151,7 @@ public class TcpServer implements Runnable {
             ctx.channel().close();
 
             // 打印异常
-            logger.error("exceptionCaught, {}", cause);
+            /*logger.error("exceptionCaught, {}", cause);*/
         }
     }
 
@@ -169,7 +162,7 @@ public class TcpServer implements Runnable {
      */
     public static void main(String[] args) {
         // 创建服务端
-        Thread serverThread = new Thread(new TcpServer(7777, 1024 * 2 * 100));
+        Thread serverThread = new Thread(new TcpServer(7777));
         serverThread.start();
     }
 }
