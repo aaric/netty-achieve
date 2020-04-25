@@ -1,4 +1,4 @@
-package com.github.aaric.achieve.netty.client;
+package com.sample.netty.client;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
