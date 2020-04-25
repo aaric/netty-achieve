@@ -1,1 +1,5 @@
-rootProject.name = 'netty-achieve'
+rootProject.name = "netty-achieve"
+
+include "netty-http-server"
+include "netty-client"
+include "netty-samples"

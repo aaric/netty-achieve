@@ -1,4 +1,6 @@
-import org.junit.Test;
+package com.sample.netty;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * NettyTest
