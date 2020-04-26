@@ -6,7 +6,7 @@ plugins {
 }
 
 allprojects {
-    group = "com.cooggo"
+    group = "com.sample"
     version = "1.0.0-SNAPSHOT"
 
     apply plugin: "java"
