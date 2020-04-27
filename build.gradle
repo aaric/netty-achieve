@@ -58,6 +58,7 @@ allprojects {
 }
 
 subprojects {
+    apply plugin: "checkstyle"
     apply plugin: "io.freefair.lombok"
 
     dependencies {
@@ -81,6 +82,17 @@ subprojects {
     compileTestJava {
         options.encoding = "UTF-8"
         options.compilerArgs << "-Xlint:unchecked"
+    }
+
+    task checkstyle(type: Checkstyle) {
+        configFile file("${rootDir}/config/checkstyle/checkstyle.xml")
+        ignoreFailures true
+        showViolations true
+        source = fileTree("src")
+        include "**/*.java"
+        exclude "**/test/**"
+        exclude "**/build/**"
+        classpath = files()
     }
 
     task removeLombokConfig() {

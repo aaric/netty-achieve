@@ -32,4 +32,4 @@ spring:
 
 # Netty settings
 netty:
-  serverPort: 7777
+  serverPort: 8888

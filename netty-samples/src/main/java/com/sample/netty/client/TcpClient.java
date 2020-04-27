@@ -9,8 +9,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.ReferenceCountUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,14 +19,10 @@ import java.util.concurrent.TimeUnit;
  * TcpClient
  *
  * @author Aaric, created on 2018-05-02T10:19.
- * @since 0.1.0-SNAPSHOT
+ * @version 0.1.0-SNAPSHOT
  */
+@Log4j2
 public class TcpClient implements Runnable {
-
-    /**
-     * Logger
-     */
-    private static final Logger logger = LoggerFactory.getLogger(TcpClient.class);
 
     /**
      * 缓存客户端连接
@@ -71,7 +66,7 @@ public class TcpClient implements Runnable {
         workerGroup.scheduleAtFixedRate(() -> {
 
             // 打印当前已经建立连接总数
-            logger.info("Current Client Total: {}", clientMap.size());
+            log.info("Current Client Total: {}", clientMap.size());
 
             // 向服务端数据
             if (this.initClientTotal == clientMap.size()) {
@@ -123,7 +118,7 @@ public class TcpClient implements Runnable {
             }
 
         } catch (Exception e) {
-            logger.error("main, {}", e);
+            log.error("main, {}", e);
         } finally {
             // 优雅退出
             workerGroup.shutdownGracefully();
@@ -147,7 +142,7 @@ public class TcpClient implements Runnable {
             try {
                 // 打印服务端接收数据
                 ByteBuf buffer = (ByteBuf) msg;
-                logger.info("Server: {}", new String(ByteBufUtil.getBytes(buffer)));
+                log.info("Server: {}", new String(ByteBufUtil.getBytes(buffer)));
             } finally {
                 ReferenceCountUtil.release(msg);
             }
@@ -165,7 +160,7 @@ public class TcpClient implements Runnable {
             ctx.channel().writeAndFlush("I'm client!");
 
             // 打印连接信息
-            logger.info("{} connected.", ctx.channel().remoteAddress());
+            log.info("{} connected.", ctx.channel().remoteAddress());
         }
 
         /**
@@ -177,7 +172,7 @@ public class TcpClient implements Runnable {
         @Override
         public void channelInactive(ChannelHandlerContext ctx) throws Exception {
             // 打印断开信息
-            logger.info("{} disconnected.", ctx.channel().remoteAddress());
+            log.info("{} disconnected.", ctx.channel().remoteAddress());
         }
 
         /**
@@ -193,7 +188,7 @@ public class TcpClient implements Runnable {
             ctx.channel().close();
 
             // 打印异常
-            logger.error("exceptionCaught, {}", cause);
+            log.error("exceptionCaught, {}", cause);
         }
     }
 

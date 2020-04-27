@@ -7,6 +7,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class NettyServerRunner implements CommandLineRunner {
 
+    @Value("${netty.serverPort}")
+    private int serverPort;
+
     @Override
     public void run(String... args) throws Exception {
         // 启动服务
@@ -34,7 +38,7 @@ public class NettyServerRunner implements CommandLineRunner {
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new HttpServerChannel());
 
-        ChannelFuture channelFuture = serverBootstrap.bind(8080).sync();
+        ChannelFuture channelFuture = serverBootstrap.bind(serverPort).sync();
         channelFuture.channel().closeFuture().sync();
 
         // 关闭服务
