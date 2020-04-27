@@ -9,22 +9,17 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.ReferenceCountUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * TcpServer
  *
  * @author Aaric, created on 2018-05-02T10:19.
- * @since 0.1.0-SNAPSHOT
+ * @version 0.1.0-SNAPSHOT
  */
+@Log4j2
 public class TcpServer implements Runnable {
-
-    /**
-     * Logger
-     */
-    private static final Logger logger = LoggerFactory.getLogger(TcpServer.class);
-
+    
     /**
      * 绑定端口
      */
@@ -73,13 +68,13 @@ public class TcpServer implements Runnable {
 
             // 绑定端口
             ChannelFuture future = bootstrap.bind(serverPort).sync();
-            logger.info("Server start.");
+            log.info("Server start.");
 
             // 等待服务端监听端口关闭
             future.channel().closeFuture().sync();
 
         } catch (Exception e) {
-            logger.error("main, {}", e);
+            log.error("main, {}", e);
         } finally {
             // 优雅退出
             bossGroup.shutdownGracefully();
@@ -104,7 +99,7 @@ public class TcpServer implements Runnable {
             try {
                 // 打印服务端接收数据
                 ByteBuf buffer = (ByteBuf) msg;
-                logger.info("Client: {}", new String(ByteBufUtil.getBytes(buffer)));
+                log.info("Client: {}", new String(ByteBufUtil.getBytes(buffer)));
 
                 // 回复客户端数据
                 ctx.channel().writeAndFlush(Unpooled.wrappedBuffer("I'm server!".getBytes()));
@@ -123,7 +118,7 @@ public class TcpServer implements Runnable {
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
             // 打印连接信息
-            logger.info("{} connected.", ctx.channel().remoteAddress());
+            log.info("{} connected.", ctx.channel().remoteAddress());
         }
 
         /**
@@ -135,7 +130,7 @@ public class TcpServer implements Runnable {
         @Override
         public void channelInactive(ChannelHandlerContext ctx) throws Exception {
             // 打印断开信息
-            logger.info("{} disconnected.", ctx.channel().remoteAddress());
+            log.info("{} disconnected.", ctx.channel().remoteAddress());
         }
 
         /**
@@ -151,7 +146,7 @@ public class TcpServer implements Runnable {
             ctx.channel().close();
 
             // 打印异常
-            /*logger.error("exceptionCaught, {}", cause);*/
+            /*log.error("exceptionCaught, {}", cause);*/
         }
     }
 

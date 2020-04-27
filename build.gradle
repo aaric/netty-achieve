@@ -7,7 +7,7 @@ plugins {
 
 allprojects {
     group = "com.sample"
-    version = "1.0.0-SNAPSHOT"
+    version = "1.1.0-SNAPSHOT"
 
     apply plugin: "java"
     apply plugin: "io.spring.dependency-management"
@@ -26,6 +26,16 @@ allprojects {
         maven { url "https://repository.incarcloud.com/content/groups/public" }
     }
 
+    configurations {
+        developmentOnly
+        runtimeClasspath {
+            extendsFrom developmentOnly
+        }
+        /*all {
+            exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
+        }*/
+    }
+
     dependencyManagement {
         imports {
             mavenBom "org.springframework.boot:spring-boot-dependencies:$springBootVersion"
@@ -36,11 +46,11 @@ allprojects {
         dependencies {
             dependencySet(group: "org.slf4j", version: "1.7.30") {
                 entry "slf4j-api"
-                entry "slf4j-simple"
+                entry "slf4j-log4j12"
             }
 
             dependency "org.apache.commons:commons-io:1.3.2"
-            dependency "org.apache.commons:commons-lang3:3.9"
+            dependency "org.apache.commons:commons-lang3:3.10"
 
             dependency "io.netty:netty-all:4.1.48.Final"
         }
@@ -48,6 +58,7 @@ allprojects {
 }
 
 subprojects {
+    apply plugin: "checkstyle"
     apply plugin: "io.freefair.lombok"
 
     dependencies {
@@ -59,6 +70,8 @@ subprojects {
             exclude group: "junit", module: "junit"
             exclude group: "org.junit.vintage", module: "junit-vintage-engine"
         }
+
+        developmentOnly "org.springframework.boot:spring-boot-devtools"
     }
 
     compileJava {
@@ -71,10 +84,31 @@ subprojects {
         options.compilerArgs << "-Xlint:unchecked"
     }
 
+    task checkstyle(type: Checkstyle) {
+        configFile file("${rootDir}/config/checkstyle/checkstyle.xml")
+        ignoreFailures true
+        showViolations true
+        source = fileTree("src")
+        include "**/*.java"
+        exclude "**/test/**"
+        exclude "**/build/**"
+        classpath = files()
+    }
+
     task removeLombokConfig() {
         def subProjectPath = project.projectDir
         if (null != subProjectPath) {
             def lombokConfigFile = new File(subProjectPath, "lombok.config")
+            if (lombokConfigFile.exists()) {
+                lombokConfigFile.delete()
+            }
+        }
+    }
+
+    task removeOutputLog() {
+        def subProjectPath = project.projectDir
+        if (null != subProjectPath) {
+            def lombokConfigFile = new File(subProjectPath, "output.log")
             if (lombokConfigFile.exists()) {
                 lombokConfigFile.delete()
             }
