@@ -7,7 +7,7 @@ plugins {
 
 allprojects {
     group = "com.sample"
-    version = "1.1.0-SNAPSHOT"
+    version = "1.2.0-SNAPSHOT"
 
     apply plugin: "java"
     apply plugin: "io.spring.dependency-management"
@@ -82,6 +82,10 @@ subprojects {
     compileTestJava {
         options.encoding = "UTF-8"
         options.compilerArgs << "-Xlint:unchecked"
+    }
+
+    test {
+        useJUnitPlatform()
     }
 
     task checkstyle(type: Checkstyle) {
