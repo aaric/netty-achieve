@@ -1,5 +1,6 @@
 rootProject.name = "netty-achieve"
 
-include "netty-http-server"
+include "netty-server-http"
+include "netty-server-socket"
 include "netty-client"
 include "netty-samples"
