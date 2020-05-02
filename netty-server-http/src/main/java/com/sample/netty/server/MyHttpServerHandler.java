@@ -9,13 +9,13 @@ import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * HttpServerHandler
+ * MyHttpServerHandler
  *
  * @author Aaric, created on 2020-04-27T19:33.
  * @version 1.1.0-SNAPSHOT
  */
 @Slf4j
-public class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
+public class MyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
@@ -61,5 +61,11 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
         log.info("channel unregistered...");
         super.channelUnregistered(ctx);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        log.error("exceptionCaught", cause);
+        ctx.close();
     }
 }
