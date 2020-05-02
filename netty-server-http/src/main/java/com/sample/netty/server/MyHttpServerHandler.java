@@ -62,4 +62,10 @@ public class MyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject>
         log.info("channel unregistered...");
         super.channelUnregistered(ctx);
     }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        log.error("exceptionCaught", cause);
+        ctx.close();
+    }
 }
