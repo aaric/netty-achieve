@@ -1,0 +1,20 @@
+apply plugin: "org.springframework.boot"
+
+//configurations {
+//    all {
+//        exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
+//    }
+//}
+
+dependencies {
+    implementation "io.netty:netty-all"
+
+    implementation "com.incarcloud:boar-shared:1.2-SNAPSHOT"
+    implementation "com.incarcloud:boar-datapack-ic:1.2-SNAPSHOT"
+
+    implementation "org.springframework.boot:spring-boot-starter"
+//    implementation "org.springframework.boot:spring-boot-starter-log4j2"
+    implementation "org.springframework.boot:spring-boot-starter-data-redis"
+
+    implementation "org.springframework.kafka:spring-kafka"
+}
