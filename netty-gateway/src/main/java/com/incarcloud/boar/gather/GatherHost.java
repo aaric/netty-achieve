@@ -42,8 +42,9 @@ public class GatherHost {
      * 添加采集槽
      *
      * @param slotCfg 采集槽配置
+     * @throws Exception
      */
-    public void addSlot(String slotCfg) {
+    public void addSlot(String slotCfg) throws Exception {
         if (StringUtils.isEmpty(slotCfg)) {
             throw new RuntimeException("No slot cfg!!!");
         }
@@ -55,12 +56,38 @@ public class GatherHost {
             String protocol = slot.split(":")[1];
             String port = slot.split(":")[2];
 
+            // 初始化采集槽列表
+            GatherSlot gatherSlot;
+            switch (protocol.toLowerCase()) {
+                case GatherTCPSlot.SUPPORT_PROTOCOL:
+                    // TCP
+                    gatherSlot = new GatherTCPSlot(this, Integer.parseInt(port));
+                    gatherSlot.setDataParser(parser);
+                    slots.add(gatherSlot);
+                    break;
+                case GatherUDPSlot.SUPPORT_PROTOCOL:
+                    gatherSlot = new GatherUDPSlot(this, Integer.parseInt(port));
+                    gatherSlot.setDataParser(parser);
+                    slots.add(gatherSlot);
+                    // UDP
+                    break;
+                default:
+                    // MQTT
+                    throw new UnsupportedOperationException(parser);
+            }
+
+            // 打印日志
             log.info("{}-{}-{} added.", parser, protocol, port);
 
         }
     }
 
-    public void start() {
+    /**
+     * 启动服务
+     *
+     * @throws Exception
+     */
+    public void start() throws Exception {
         log.info("starting...");
 
         // 忽略已启动
@@ -68,21 +95,38 @@ public class GatherHost {
             return;
         }
 
-        // 添加采集槽
+        // 判断采集槽是否为空
         if (null == slots || 0 == slots.size()) {
             throw new RuntimeException("No slot!!!");
         }
 
+        // 启动所有采集槽
+        for (GatherSlot slot : slots) {
+            slot.startup();
+        }
 
         // 已启动
         bRunning = true;
 
+        // 打印日志
         log.info("{} started.", this.name);
     }
 
     public void stop() {
         log.info("stopping...");
 
+        // 关闭所有采集槽
+        for (GatherSlot slot : slots) {
+            slot.shutdown();
+        }
+
+        // 已关闭
+        bRunning = true;
+
         log.info("stopped.");
+    }
+
+    public String getName() {
+        return name;
     }
 }
