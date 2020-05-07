@@ -50,7 +50,7 @@ public class GatherHost {
 
         // 构建采集槽
         for (String slot : slotCfg.split(",")) {
-            // 解析器-通信协议-通信端口
+            // slot格式 -> 解析器:通信协议:通信端口
             String parser = slot.split(":")[0];
             String protocol = slot.split(":")[1];
             String port = slot.split(":")[2];
