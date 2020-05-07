@@ -1,5 +1,6 @@
 package com.incarcloud.boar.runner;
 
+import com.incarcloud.boar.gather.GatherHost;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,9 +26,28 @@ public class GatewayRunner implements CommandLineRunner {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
+    @Value("${incarcloud.host.slots}")
+    private String slots;
+
+    private GatherHost gatherHost;
+
     @Override
     public void run(String... args) throws Exception {
         log.debug("send msg...");
         kafkaTemplate.send(topicTBox, "hello world");
+
+        /**
+         * 启动网关服务
+         */
+        gatherHost = new GatherHost();
+        gatherHost.addSlot(slots);
+        gatherHost.start();
+
+        /**
+         * 关闭网关服务
+         */
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            gatherHost.stop();
+        }));
     }
 }
