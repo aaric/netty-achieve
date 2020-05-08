@@ -2,6 +2,8 @@ package com.incarcloud.boar.gather;
 
 import com.incarcloud.boar.datapack.IDataParser;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.Instant;
 
@@ -29,6 +31,21 @@ public abstract class GatherSlot {
      */
     protected IDataParser dataParser;
 
+    /**
+     * Redis操作
+     */
+    private RedisTemplate<String, String> redisTemplate;
+
+    /**
+     * Kafka操作
+     */
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    /**
+     * Kafka主题
+     */
+    private String kafkaTopic;
+
     protected GatherSlot(GatherHost host) {
         this.host = host;
         this.name = String.format("%s-host-%d",
@@ -48,6 +65,60 @@ public abstract class GatherSlot {
     }
 
     /**
+     * 设置Redis操作对象
+     *
+     * @param redisTemplate Redis操作对象
+     */
+    public void setRedisTemplate(RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
+
+    /**
+     * 获取Redis操作对象
+     *
+     * @return
+     */
+    public RedisTemplate<String, String> getRedisTemplate() {
+        return redisTemplate;
+    }
+
+    /**
+     * 设置Kafka操作对象
+     *
+     * @param kafkaTemplate Kafka操作对象
+     */
+    public void setKafkaTemplate(KafkaTemplate<String, String> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
+    }
+
+    /**
+     * Kafka操作对象
+     *
+     * @return
+     */
+    public KafkaTemplate<String, String> getKafkaTemplate() {
+        return kafkaTemplate;
+    }
+
+    /**
+     * 设置Kafka主题字符串
+     *
+     * @param kafkaTopic Kafka主题字符串
+     */
+    public void setKafkaTopic(String kafkaTopic) {
+        this.kafkaTopic = kafkaTopic;
+    }
+
+    /**
+     * 获取Kafka主题字符串
+     *
+     * @return
+     */
+    public String getKafkaTopic() {
+        return kafkaTopic;
+    }
+
+    /**
      * 启动服务
      */
     public abstract void startup() throws InterruptedException;
@@ -64,6 +135,15 @@ public abstract class GatherSlot {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * 获取数据包解析器
+     *
+     * @return
+     */
+    public IDataParser getDataParser() {
+        return dataParser;
     }
 
     /**

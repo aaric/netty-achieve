@@ -1,6 +1,11 @@
 package com.incarcloud.boar.gather;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -13,6 +18,7 @@ import java.util.List;
  * @version 1.3.0-SNAPSHOT
  */
 @Slf4j
+@Component
 public class GatherHost {
 
     /**
@@ -29,6 +35,24 @@ public class GatherHost {
      * 采集槽列表
      */
     private ArrayList<GatherSlot> slots = new ArrayList<>();
+
+    /**
+     * Redis操作
+     */
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
+    /**
+     * Kafka操作
+     */
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    /**
+     * Kafka主题
+     */
+    @Value("${spring.kafka.topic.tbox}")
+    private String kafkaTopic;
 
     public GatherHost() {
         this(String.format("host-%d", Instant.now().toEpochMilli()));
@@ -63,11 +87,17 @@ public class GatherHost {
                     // TCP
                     gatherSlot = new GatherTCPSlot(this, Integer.parseInt(port));
                     gatherSlot.setDataParser(parser);
+                    gatherSlot.setRedisTemplate(redisTemplate);
+                    gatherSlot.setKafkaTemplate(kafkaTemplate);
+                    gatherSlot.setKafkaTopic(kafkaTopic);
                     slots.add(gatherSlot);
                     break;
                 case GatherUDPSlot.SUPPORT_PROTOCOL:
                     gatherSlot = new GatherUDPSlot(this, Integer.parseInt(port));
                     gatherSlot.setDataParser(parser);
+                    gatherSlot.setRedisTemplate(redisTemplate);
+                    gatherSlot.setKafkaTemplate(kafkaTemplate);
+                    gatherSlot.setKafkaTopic(kafkaTopic);
                     slots.add(gatherSlot);
                     // UDP
                     break;

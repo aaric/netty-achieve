@@ -1,10 +1,12 @@
 package com.incarcloud.boar.gather;
 
+import com.incarcloud.boar.datapack.IDataParser;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 采集槽处理器
@@ -31,9 +33,20 @@ public class GatherChannelHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        ByteBuf buffer = (ByteBuf) msg;
+        // 初始化对象
+        IDataParser parser = slot.getDataParser();
+        log.info(slot.getKafkaTopic());
 
-        log.info("msg: {}", ByteBufUtil.hexDump(buffer));
+        // 打印数据包信息
+        ByteBuf buffer = (ByteBuf) msg;
+        log.info("IDataParser: {}, Receive Bytes: {}", parser.getClass().getSimpleName(), ByteBufUtil.hexDump(buffer));
+
+        // 1.获得设备号
+        String deviceId = parser.getDeviceSn(buffer);
+        log.debug("deviceId: " + deviceId);
+        if (StringUtils.isBlank(deviceId)) {
+            return;
+        }
     }
 
     @Override
