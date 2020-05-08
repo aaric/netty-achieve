@@ -1,5 +1,6 @@
 package com.incarcloud.boar.runner;
 
+import com.incarcloud.boar.config.SlotsConfig;
 import com.incarcloud.boar.gather.GatherHost;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,10 @@ public class GatewayRunner implements CommandLineRunner {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
-    @Value("${incarcloud.host.slots}")
-    private String slots;
+    //@Value("${incarcloud.host.slots}")
+    //private String[] slots;
+    @Autowired
+    private SlotsConfig slotsConfig;
 
     private GatherHost gatherHost;
 
@@ -40,7 +43,7 @@ public class GatewayRunner implements CommandLineRunner {
          * 启动网关服务
          */
         gatherHost = new GatherHost();
-        gatherHost.addSlot(slots);
+        gatherHost.addSlot(slotsConfig.getSlots());
         gatherHost.start();
 
         /**

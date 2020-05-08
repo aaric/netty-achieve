@@ -58,6 +58,15 @@ public abstract class GatherSlot {
     public abstract void shutdown();
 
     /**
+     * 采集槽实例名称
+     *
+     * @return
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
      * 获取传输协议
      *
      * @return tcp/udp/mqtt

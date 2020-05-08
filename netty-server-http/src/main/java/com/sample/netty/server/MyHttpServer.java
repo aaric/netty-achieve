@@ -39,7 +39,7 @@ public class MyHttpServer {
                 .childHandler(new MyHttpServerChannel());
 
         ChannelFuture channelFuture = serverBootstrap.bind(serverPort).sync();
-        channelFuture.channel().closeFuture().sync();
+        channelFuture.channel().closeFuture().sync(); //阻塞后面代码执行
 
         log.info("started.");
     }
