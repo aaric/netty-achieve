@@ -64,7 +64,7 @@ incarcloud:
     # Slot服务与端口
     slots:
       - DataParserIc:tcp:6666
-      - DataParserIc:tcp:6667
+      #- DataParserIc:tcp:6667
   gateway:
     # 网关服务端口
     server:
