@@ -68,7 +68,17 @@ public class GatherTCPSlot extends GatherSlot {
     @Override
     public void startup() throws InterruptedException {
         ChannelFuture channelFuture = serverBootstrap.bind(this.port).sync();
-        channelFuture.channel().closeFuture().sync();
+        // closeFuture会阻塞后面的代码，开启一个新线程去处理阻塞逻辑
+        new Thread(() -> {
+            try {
+                channelFuture.channel().closeFuture().sync();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        // 打印日志
+        log.info("{} started.", this.getName());
     }
 
     @Override

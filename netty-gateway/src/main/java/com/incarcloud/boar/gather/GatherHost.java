@@ -1,10 +1,10 @@
 package com.incarcloud.boar.gather;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 采集槽主机
@@ -41,20 +41,20 @@ public class GatherHost {
     /**
      * 添加采集槽
      *
-     * @param slotCfg 采集槽配置
+     * @param slotCfgList 采集槽配置
      * @throws Exception
      */
-    public void addSlot(String slotCfg) throws Exception {
-        if (StringUtils.isEmpty(slotCfg)) {
+    public void addSlot(List<String> slotCfgList) throws Exception {
+        if (null == slotCfgList || 0 == slotCfgList.size()) {
             throw new RuntimeException("No slot cfg!!!");
         }
 
         // 构建采集槽
-        for (String slot : slotCfg.split(",")) {
+        for (String slotCfg : slotCfgList) {
             // slot格式 -> 解析器:通信协议:通信端口
-            String parser = slot.split(":")[0];
-            String protocol = slot.split(":")[1];
-            String port = slot.split(":")[2];
+            String parser = slotCfg.split(":")[0];
+            String protocol = slotCfg.split(":")[1];
+            String port = slotCfg.split(":")[2];
 
             // 初始化采集槽列表
             GatherSlot gatherSlot;
@@ -75,10 +75,6 @@ public class GatherHost {
                     // MQTT
                     throw new UnsupportedOperationException(parser);
             }
-
-            // 打印日志
-            log.info("{}-{}-{} added.", parser, protocol, port);
-
         }
     }
 
@@ -88,7 +84,7 @@ public class GatherHost {
      * @throws Exception
      */
     public void start() throws Exception {
-        log.info("starting...");
+        log.info("host starting...");
 
         // 忽略已启动
         if (bRunning) {
@@ -107,13 +103,10 @@ public class GatherHost {
 
         // 已启动
         bRunning = true;
-
-        // 打印日志
-        log.info("{} started.", this.name);
     }
 
     public void stop() {
-        log.info("stopping...");
+        log.info("host stopping...");
 
         // 关闭所有采集槽
         for (GatherSlot slot : slots) {

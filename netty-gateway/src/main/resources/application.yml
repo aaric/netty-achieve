@@ -60,19 +60,11 @@ spring:
 
 # Incarcloud settings
 incarcloud:
-#  kafka:
-#    # Kafka消息服务
-#    bootstrapServers: ${KAFKA_BOOTSTRAPSERVERS:10.0.11.36:9092,10.0.11.37:9092,10.0.11.38:9092}
-#    topic:
-#      tbox: zs-tbox
-#      tboxControl: zs-tbox-control
-#      tboxControlFeedback: zs-tbox-control-feedback
-#    groupId:
-#      remote: ${KAFKA_GROUPID_REMOTE:zs-gather-server-1}
   host:
     # Slot服务与端口
-    #slots: ${BOAR_HOST_SLOTS:Jtt808DataParser:tcp:10666}
-    slots: ${BOAR_HOST_SLOTS:DataParserIc:tcp:6666}
+    slots:
+      - DataParserIc:tcp:6666
+      - DataParserIc:tcp:6667
   gateway:
     # 网关服务端口
     server:
