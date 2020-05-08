@@ -48,7 +48,7 @@ public abstract class GatherSlot {
 
     protected GatherSlot(GatherHost host) {
         this.host = host;
-        this.name = String.format("%s-host-%d",
+        this.name = String.format("%s-slot-%d",
                 host.getName(), Instant.now().toEpochMilli());
     }
 
