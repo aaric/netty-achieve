@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * 网关启动类
  *
  * @author Aaric, created on 2020-05-07T16:11.
- * @version 1.5.0-SNAPSHOT
+ * @version 1.3.0-SNAPSHOT
  */
 @Slf4j
 @Order(1)

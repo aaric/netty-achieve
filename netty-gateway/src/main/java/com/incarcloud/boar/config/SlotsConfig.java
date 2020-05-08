@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 /**
- * com.incarcloud.boar.config
+ * 采集槽配置
  *
  * @author Aaric, created on 2020-05-08T09:38.
  * @version 1.3.0-SNAPSHOT

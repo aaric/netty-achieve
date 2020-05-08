@@ -170,10 +170,10 @@
             <property name="format" value="System\.out\.println"/>
             <property name="illegalPattern" value="true"/>
         </module>
-        <!-- return个数10(3)个-->
-        <module name="ReturnCount">
-            <property name="max" value="10"/>
-        </module>
+        <!-- return个数 3个-->
+<!--        <module name="ReturnCount">-->
+<!--            <property name="max" value="3"/>-->
+<!--        </module>-->
         <!--try catch 异常处理数量 3-->
         <module name="NestedTryDepth ">
             <property name="max" value="3"/>
