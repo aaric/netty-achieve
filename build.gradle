@@ -7,10 +7,7 @@ plugins {
 
 allprojects {
     group = "com.sample"
-    version = "1.4.0-SNAPSHOT"
-
-    apply plugin: "java"
-    apply plugin: "io.spring.dependency-management"
+    version = "1.3.3-SNAPSHOT"
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
@@ -25,6 +22,13 @@ allprojects {
         maven { url "https://maven.aliyun.com/repository/public" }
         maven { url "https://repository.incarcloud.com/content/groups/public" }
     }
+}
+
+subprojects {
+    apply plugin: "java"
+    apply plugin: "checkstyle"
+    apply plugin: "io.freefair.lombok"
+    apply plugin: "io.spring.dependency-management"
 
     configurations {
         developmentOnly
@@ -34,6 +38,19 @@ allprojects {
         /*all {
             exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
         }*/
+    }
+
+    dependencies {
+        implementation "org.slf4j:slf4j-api"
+
+        testImplementation "org.junit.jupiter:junit-jupiter-api"
+        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
+        testImplementation("org.springframework.boot:spring-boot-starter-test") {
+            exclude group: "junit", module: "junit"
+            exclude group: "org.junit.vintage", module: "junit-vintage-engine"
+        }
+
+        developmentOnly "org.springframework.boot:spring-boot-devtools"
     }
 
     dependencyManagement {
@@ -54,24 +71,6 @@ allprojects {
 
             dependency "io.netty:netty-all:4.1.48.Final"
         }
-    }
-}
-
-subprojects {
-    apply plugin: "checkstyle"
-    apply plugin: "io.freefair.lombok"
-
-    dependencies {
-        implementation "org.slf4j:slf4j-api"
-
-        testImplementation "org.junit.jupiter:junit-jupiter-api"
-        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
-        testImplementation("org.springframework.boot:spring-boot-starter-test") {
-            exclude group: "junit", module: "junit"
-            exclude group: "org.junit.vintage", module: "junit-vintage-engine"
-        }
-
-        developmentOnly "org.springframework.boot:spring-boot-devtools"
     }
 
     compileJava {
