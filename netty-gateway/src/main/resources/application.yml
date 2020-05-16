@@ -64,7 +64,7 @@ incarcloud:
     # 配置slot解析器，协议与服务端口
     slots:
       - DataParserIc:tcp:6666
-      #- DataParserIc:tcp:6667
+      - DataParserJtt808:tcp:10666
   gateway:
     # 网关服务端口
     server:

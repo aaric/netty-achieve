@@ -1,7 +1,6 @@
 package com.incarcloud.boar.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.KafkaListener;
 
 /**
@@ -11,11 +10,11 @@ import org.springframework.kafka.annotation.KafkaListener;
  * @version 1.3.0-SNAPSHOT
  */
 @Slf4j
-@Configuration
+//@Configuration
 public class KafkaConfig {
 
     @KafkaListener(topics = "${spring.kafka.topic.tbox}")
-    public void processTopicTBox(byte[] content) {
+    public void processTopicTBox(String content) {
         // 打印日志
         log.debug("content: {}", content);
 
