@@ -27,6 +27,9 @@ public class FluxController {
     @Autowired
     private FluxService fluxService;
 
+    /**
+     * Mono：实现Publisher并返回0或1个元素
+     */
     @GetMapping("/just1")
     public Mono<String> just1() {
         return Mono.just("Hello WebFlux");
@@ -44,6 +47,9 @@ public class FluxController {
         });
     }
 
+    /**
+     * Flux：实现Publisher并返回N个元素
+     */
     @GetMapping("/just2")
     public Flux<String> just2() {
         return Flux.just("Hello", "Web", "Flux");
