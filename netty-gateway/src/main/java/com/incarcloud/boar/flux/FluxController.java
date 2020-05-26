@@ -1,6 +1,5 @@
-package com.incarcloud.boar.controller;
+package com.incarcloud.boar.flux;
 
-import com.incarcloud.boar.service.FluxService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.codec.ServerSentEvent;
@@ -15,7 +14,7 @@ import java.time.Duration;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * WebFlux Test
+ * FluxController
  *
  * @author Aaric, created on 2020-05-26T09:29.
  * @version 1.4.0-SNAPSHOT

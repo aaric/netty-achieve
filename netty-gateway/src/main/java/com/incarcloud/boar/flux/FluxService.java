@@ -1,4 +1,4 @@
-package com.incarcloud.boar.service;
+package com.incarcloud.boar.flux;
 
 import lombok.Data;
 import org.springframework.stereotype.Service;
@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * WebFlux Test
+ * FluxService
  *
  * @author Aaric, created on 2020-05-26T10:09.
  * @version 1.4.0-SNAPSHOT
