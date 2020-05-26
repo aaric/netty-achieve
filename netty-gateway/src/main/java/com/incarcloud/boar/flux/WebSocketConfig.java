@@ -1,6 +1,5 @@
-package com.incarcloud.boar.config;
+package com.incarcloud.boar.flux;
 
-import com.incarcloud.boar.flux.EchoHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
