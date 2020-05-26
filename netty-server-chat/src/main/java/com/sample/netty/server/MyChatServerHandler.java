@@ -34,7 +34,15 @@ public class MyChatServerHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+        Channel channel = ctx.channel();
 
+        channelGroup.forEach(ch -> {
+            if (ch != channel) {
+                ch.writeAndFlush(String.format("[%s] %s\n", ch.remoteAddress(), msg));
+            } else {
+                ch.writeAndFlush(String.format("[myself] %s\n", msg));
+            }
+        });
     }
 
     @Override
