@@ -2,6 +2,7 @@ package com.incarcloud.boar.flux;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +36,14 @@ public class FluxController {
         return Mono.just("Hello WebFlux");
     }
 
+    /**
+     * Flux：实现Publisher并返回N个元素
+     */
+    @GetMapping("/just2")
+    public Flux<String> just2() {
+        return Flux.just("Hello", "Web", "Flux");
+    }
+
     @GetMapping("/sub")
     public Mono<Object> sub() {
         return Mono.create(sink -> {
@@ -47,16 +56,14 @@ public class FluxController {
         });
     }
 
-    /**
-     * Flux：实现Publisher并返回N个元素
-     */
-    @GetMapping("/just2")
-    public Flux<String> just2() {
-        return Flux.just("Hello", "Web", "Flux");
+    @GetMapping(value = "/sse1", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> sse1() {
+        return Flux.interval(Duration.ofSeconds(1))
+                .map(val -> "-> " + val);
     }
 
-    @GetMapping("/sse")
-    public Flux<ServerSentEvent<Integer>> sse() {
+    @GetMapping("/sse2")
+    public Flux<ServerSentEvent<Integer>> sse2() {
         return Flux.interval(Duration.ofSeconds(1))
                 .map(seq -> Tuples.of(seq, ThreadLocalRandom.current().nextInt()))
                 .map(data -> {
