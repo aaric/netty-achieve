@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,12 +56,34 @@ public class FluxController {
         });
     }
 
+    /* javascript support
+      const eventSource = new EventSource("http://localhost:8080/api/flux/sse2")
+      eventSource.onopen = function(e) {
+        console.log("onopen ->")
+      }
+      eventSource.onmessage = function(e) {
+        // http://localhost:8080/api/flux/sse1
+        console.log("onmessage ->")
+        console.log(e.data)
+      }
+      eventSource.onerror = function(e) {
+        console.log("onerror ->")
+        console.log(e)
+      }
+      eventSource.addEventListener("random", function(e){
+        // http://localhost:8080/api/flux/sse2
+        console.log(e.lastEventId + ": " + e.data)
+      })
+     */
+
+    @CrossOrigin
     @GetMapping(value = "/sse1", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> sse1() {
         return Flux.interval(Duration.ofSeconds(1))
                 .map(data -> "-> " + data);
     }
 
+    @CrossOrigin
     @GetMapping("/sse2")
     public Flux<ServerSentEvent<String>> sse2() {
         /*Flux<Long> flux = Flux.interval(Duration.ofSeconds(1));
