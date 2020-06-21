@@ -7,10 +7,7 @@ plugins {
 
 allprojects {
     group = "com.sample"
-    version = "1.3.4-SNAPSHOT"
-
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    version = "1.4.0-SNAPSHOT"
 
     ext {
         springBootVersion = "2.2.5.RELEASE"
@@ -29,6 +26,9 @@ subprojects {
     apply plugin: "checkstyle"
     apply plugin: "io.freefair.lombok"
     apply plugin: "io.spring.dependency-management"
+
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 
     configurations {
         developmentOnly
@@ -63,6 +63,7 @@ subprojects {
         dependencies {
             dependencySet(group: "org.slf4j", version: "1.7.30") {
                 entry "slf4j-api"
+                entry "slf4j-simple"
                 entry "slf4j-log4j12"
             }
 

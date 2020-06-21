@@ -41,8 +41,8 @@ public class GatherChannelHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-        log.info("handlerAdded");
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        log.info("channelActive");
     }
 
     @Override
@@ -141,8 +141,8 @@ public class GatherChannelHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-        log.info("handlerAdded");
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        log.info("channelInactive");
     }
 
     @Override
