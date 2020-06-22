@@ -53,6 +53,7 @@ public class NioTests {
     }
 
     @Test
+    @Disabled
     public void testChannelRead() throws Exception {
         FileInputStream fileInputStream = new FileInputStream("hello.log");
         FileChannel fileChannel = fileInputStream.getChannel();
