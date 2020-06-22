@@ -1,6 +1,7 @@
 package com.sample.netty;
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileInputStream;
@@ -34,6 +35,7 @@ public class NioTests {
     }
 
     @Test
+    @Disabled
     public void testChannelWrite() throws Exception {
         FileOutputStream fileOutputStream = new FileOutputStream("hello.log");
         FileChannel fileChannel = fileOutputStream.getChannel();
