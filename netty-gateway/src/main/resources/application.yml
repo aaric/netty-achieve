@@ -13,7 +13,7 @@ management:
 ## 使用starter log4j2省略log4j2.xml文件
 logging:
   level:
-    root: WARN
+    root: INFO
     org:
       springframework:
         security: INFO
