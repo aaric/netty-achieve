@@ -1,6 +1,7 @@
 package com.sample.netty;
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -8,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.nio.ReadOnlyBufferException;
 import java.nio.channels.FileChannel;
 
 /**
@@ -109,6 +111,40 @@ public class NioTests {
 
         buffer.position(0);
         buffer.limit(buffer.capacity());
+
+        while (buffer.hasRemaining()) {
+            log.debug("{}", buffer.get());
+        }
+    }
+
+    @Test
+    public void testBufferAsReadOnlyBuffer() {
+        ByteBuffer buffer = ByteBuffer.allocate(10);
+        log.debug("default class: {}", buffer.getClass());
+
+        for (int i = 0; i < buffer.capacity(); i++) {
+            buffer.put((byte) i);
+        }
+
+        ByteBuffer readOnlyBuffer = buffer.asReadOnlyBuffer();
+        log.debug("readonly class: {}", readOnlyBuffer.getClass());
+
+        Assertions.assertThrows(ReadOnlyBufferException.class, () -> {
+            readOnlyBuffer.position(0);
+            readOnlyBuffer.put((byte) 0);
+        });
+    }
+
+    @Test
+    public void testAllocateDirect() {
+        ByteBuffer buffer = ByteBuffer.allocateDirect(10);
+        log.debug("direct class: {}", buffer.getClass());
+
+        for (int i = 0; i < buffer.capacity(); i++) {
+            buffer.put((byte) i);
+        }
+
+        buffer.flip();
 
         while (buffer.hasRemaining()) {
             log.debug("{}", buffer.get());
