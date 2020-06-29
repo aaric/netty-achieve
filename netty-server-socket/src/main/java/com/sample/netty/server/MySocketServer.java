@@ -18,7 +18,7 @@ public class MySocketServer {
 
     private int serverPort;
     private EventLoopGroup bossGroup;
-    private EventLoopGroup workGroup;
+    private EventLoopGroup workerGroup;
 
     public MySocketServer(int serverPort) {
         this.serverPort = serverPort;
@@ -30,10 +30,10 @@ public class MySocketServer {
     public void start() throws InterruptedException {
         log.info("starting...");
         bossGroup = new NioEventLoopGroup();
-        workGroup = new NioEventLoopGroup();
+        workerGroup = new NioEventLoopGroup();
 
         ServerBootstrap serverBootstrap = new ServerBootstrap();
-        serverBootstrap.group(bossGroup, workGroup)
+        serverBootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new MySocketServerChannel());
 
@@ -47,7 +47,7 @@ public class MySocketServer {
         log.info("stopping...");
 
         bossGroup.shutdownGracefully();
-        workGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
 
         log.info("stopped.");
     }
