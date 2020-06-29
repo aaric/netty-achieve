@@ -89,4 +89,29 @@ public class NioTests {
         log.debug("{}", buffer.getDouble());
         log.debug("{}", buffer.getChar());
     }
+
+    @Test
+    public void testBufferSlice() {
+        ByteBuffer buffer = ByteBuffer.allocate(10);
+
+        for (int i = 0; i < buffer.capacity(); i++) {
+            buffer.put((byte) i);
+        }
+
+        buffer.position(2);
+        buffer.limit(6);
+
+        ByteBuffer sliceBuffer = buffer.slice();
+
+        for (int i = 0; i < sliceBuffer.capacity(); i++) {
+            buffer.put(i, (byte) (buffer.get(i) * 2));
+        }
+
+        buffer.position(0);
+        buffer.limit(buffer.capacity());
+
+        while (buffer.hasRemaining()) {
+            log.debug("{}", buffer.get());
+        }
+    }
 }
