@@ -17,7 +17,7 @@ public class App {
      *
      * @param args 命令行参数
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         SpringApplication.run(App.class, args);
     }
 }

@@ -57,7 +57,7 @@ public class NettyServerRunner implements CommandLineRunner {
                 });
 
         ChannelFuture channelFuture = serverBootstrap.bind(serverPort).sync();
-        channelFuture.channel().close().sync();
+        channelFuture.channel().closeFuture().sync();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             bossGroup.shutdownGracefully();
