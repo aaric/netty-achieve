@@ -68,4 +68,25 @@ public class NioTests {
 
         fileInputStream.close();
     }
+
+    @Test
+    public void testByteBuffer() {
+        ByteBuffer buffer = ByteBuffer.allocate(512);
+
+        buffer.putShort((short) 127);
+        buffer.putInt(10);
+        buffer.putLong(10000);
+        buffer.putFloat(180.0F);
+        buffer.putDouble(3.14D);
+        buffer.putChar('a');
+
+        buffer.flip();
+
+        log.debug("{}", buffer.getShort());
+        log.debug("{}", buffer.getInt());
+        log.debug("{}", buffer.getLong());
+        log.debug("{}", buffer.getFloat());
+        log.debug("{}", buffer.getDouble());
+        log.debug("{}", buffer.getChar());
+    }
 }
