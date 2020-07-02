@@ -15,7 +15,9 @@ import org.junit.jupiter.api.Test;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * ProtocolEngineJtt808Tests
@@ -77,7 +79,7 @@ public class ProtocolEngineJtt808Tests {
         @Number(width = 8, length = "lengthMsgContent", encoder = "encodeMsgContent", decoder = "decodeMsgContent")
         private byte[] msgContent;
         @Number(width = 8)
-        private byte validCode;
+        private byte validCode = 0x00;
         @Number(width = 8)
         private int flagT = 0x7e;
 
@@ -98,6 +100,47 @@ public class ProtocolEngineJtt808Tests {
             } else {
                 this.msgContent = content;
             }
+        }
+
+        public static byte[] addCheck(byte[] bytes) {
+            byte check = 0x00;
+            for (int i = 1; i <= bytes.length - 3; i++) {
+                check ^= bytes[i];
+            }
+            bytes[bytes.length - 2] = check;
+            return bytes;
+        }
+
+        public static byte[] toConvert(byte[] bytes) {
+            // 标识位(0x7e)
+            if (0x7E == (bytes[0] & 0xFF) && 0x7E == (bytes[bytes.length - 1] & 0xFF)) {
+                // 转义规则：0x7E->0x7D0x02, 0x7D->0x7D0x01
+                List<Byte> byteList = new ArrayList<>();
+                byteList.add(bytes[0]); // 0x7E
+                for (int i = 1; i < bytes.length - 1; i++) {
+                    if (0x7E == (bytes[i] & 0xFF)) {
+                        // 0x7E->0x7D0x02
+                        byteList.add((byte) 0x7D);
+                        byteList.add((byte) 0x02);
+                    } else if (0x7D == (bytes[i] & 0xFF)) {
+                        // 0x7D->0x7D0x01
+                        byteList.add((byte) 0x7D);
+                        byteList.add((byte) 0x01);
+                    } else {
+                        byteList.add(bytes[i]);
+                    }
+                }
+                byteList.add(bytes[bytes.length - 1]); //0x7E
+
+                // List<Byte> --> byte[]
+                byte[] shiftBytes = new byte[byteList.size()];
+                for (int i = 0; i < shiftBytes.length; i++) {
+                    shiftBytes[i] = byteList.get(i).byteValue();
+                }
+
+                return shiftBytes;
+            }
+            return null;
         }
     }
 
@@ -166,9 +209,8 @@ public class ProtocolEngineJtt808Tests {
         Jtt808Packet packet = new Jtt808Packet();
         packet.setHeader(header);
         packet.setMsgContent(content);
-        packet.setValidCode((byte) 0xd4);
 
-        byte[] genBytes = engine.encode(packet);
+        byte[] genBytes = Jtt808Packet.toConvert(Jtt808Packet.addCheck(engine.encode(packet)));
         log.debug("{}", ByteBufUtil.hexDump(genBytes));
     }
 }
