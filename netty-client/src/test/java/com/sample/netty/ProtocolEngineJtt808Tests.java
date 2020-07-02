@@ -111,7 +111,7 @@ public class ProtocolEngineJtt808Tests {
             return bytes;
         }
 
-        public static byte[] toConvert(byte[] bytes) {
+        public static byte[] byte2Convert(byte[] bytes) {
             // 标识位(0x7e)
             if (0x7E == (bytes[0] & 0xFF) && 0x7E == (bytes[bytes.length - 1] & 0xFF)) {
                 // 转义规则：0x7E->0x7D0x02, 0x7D->0x7D0x01
@@ -210,7 +210,7 @@ public class ProtocolEngineJtt808Tests {
         packet.setHeader(header);
         packet.setMsgContent(content);
 
-        byte[] genBytes = Jtt808Packet.toConvert(Jtt808Packet.addCheck(engine.encode(packet)));
+        byte[] genBytes = Jtt808Packet.byte2Convert(Jtt808Packet.addCheck(engine.encode(packet)));
         log.debug("{}", ByteBufUtil.hexDump(genBytes));
     }
 }
