@@ -3,7 +3,6 @@ package com.sample.netty;
 import com.github.io.protocol.annotation.ByteOrder;
 import com.github.io.protocol.annotation.Element;
 import com.github.io.protocol.annotation.Number;
-import com.github.io.protocol.annotation.Sign;
 import com.github.io.protocol.core.ProtocolEngine;
 import com.incarcloud.boar.util.DataPackUtil;
 import io.netty.buffer.ByteBufUtil;
@@ -32,7 +31,7 @@ public class ProtocolEngineJtt808Tests {
         private int encryptMode = 0;
         @Number(width = 10, order = ByteOrder.BigEndian)
         private int msgLength;*/
-        @Number(width = 16, order = ByteOrder.BigEndian)
+        @Number(width = 16, order = ByteOrder.BigEndian) //set prev 6bit=0
         private int msgLength;
     }
 
@@ -42,7 +41,7 @@ public class ProtocolEngineJtt808Tests {
         private int msgId;
         @Element
         private MsgProp msgProp;
-        @Number(width = 8, length = "getDeviceSnLength", encoder = "encodeDeviceSn", decoder = "decodeDeviceSn", sign = Sign.Signed)
+        @Number(width = 8, length = "getDeviceSnLength", encoder = "encodeDeviceSn", decoder = "decodeDeviceSn")
         private long deviceSn;
         @Number(width = 16, order = ByteOrder.BigEndian)
         private int msgSn;
@@ -69,7 +68,7 @@ public class ProtocolEngineJtt808Tests {
         private int flagH = 0x7e;
         @Element
         private Header header;
-        @Number(width = 8, length = "getMsgContentLength", encoder = "encodeMsgContent", decoder = "decodeMsgContent", sign = Sign.Signed)
+        @Number(width = 8, length = "getMsgContentLength", encoder = "encodeMsgContent", decoder = "decodeMsgContent")
         private byte[] msgContent;
         @Number(width = 8)
         private byte validCode;
