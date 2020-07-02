@@ -190,8 +190,8 @@ public class ProtocolEngineJtt808Tests {
         ProtocolEngine engine = new ProtocolEngine();
 
         Position position = new Position();
-        position.setLatitude(114.4036630000D);
-        position.setLongitude(30.4757560000D);
+        position.setLatitude(114.403663D);
+        position.setLongitude(30.475756D);
         position.setAltitude(15);
         position.setSpeed(0);
         position.setDirection(0);
