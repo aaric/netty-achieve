@@ -10,10 +10,9 @@ import io.netty.buffer.ByteBufUtil;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.junit.jupiter.api.Test;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -195,8 +194,8 @@ public class ProtocolEngineJtt808Tests {
         position.setAltitude(15);
         position.setSpeed(0);
         position.setDirection(0);
-        DateFormat dateFormat = new SimpleDateFormat("yyMMddHHmmss");
-        position.setDetectionTime(Long.valueOf(dateFormat.format(Date.from(Instant.now()))));
+        String currentTimeString = DateFormatUtils.format(Date.from(Instant.now()), "yyMMddHHmmss");
+        position.setDetectionTime(Long.valueOf(currentTimeString));
 
         byte[] content = engine.encode(position);
 
