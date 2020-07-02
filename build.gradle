@@ -7,7 +7,7 @@ plugins {
 
 allprojects {
     group = "com.sample"
-    version = "1.6.2-SNAPSHOT"
+    version = "1.7.0-SNAPSHOT"
 
     ext {
         springBootVersion = "2.2.5.RELEASE"
@@ -71,6 +71,8 @@ subprojects {
             dependency "org.apache.commons:commons-lang3:3.10"
 
             dependency "io.netty:netty-all:4.1.48.Final"
+
+            dependency "com.github.ioprotocol:com-github-ioprotocol:1.2.0"
         }
     }
 

@@ -23,7 +23,7 @@ logging:
   file:
     path: ${LOGGING_FILE_PATH:./}
     name: output.log
-    max-size: ${LOGGING_FILE_MAX_SIZE:20MB}
+    max-size: ${LOGGING_FILE_MAX_SIZE:200MB}
 
 # Spring settings
 spring:
@@ -34,4 +34,4 @@ spring:
 
 # Netty settings
 netty:
-  serverPort: 8888
+  serverPort: 7777
