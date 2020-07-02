@@ -4,4 +4,6 @@ dependencies {
     implementation "io.netty:netty-all"
 
     implementation "com.github.ioprotocol:com-github-ioprotocol"
+
+    implementation "com.incarcloud:boar-shared:1.2-SNAPSHOT"
 }

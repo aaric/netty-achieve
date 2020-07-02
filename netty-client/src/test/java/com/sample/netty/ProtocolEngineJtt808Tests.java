@@ -1,8 +1,11 @@
 package com.sample.netty;
 
+import com.github.io.protocol.annotation.ByteOrder;
+import com.github.io.protocol.annotation.Element;
 import com.github.io.protocol.annotation.Number;
-import com.github.io.protocol.annotation.*;
+import com.github.io.protocol.annotation.Sign;
 import com.github.io.protocol.core.ProtocolEngine;
+import com.incarcloud.boar.util.DataPackUtil;
 import io.netty.buffer.ByteBufUtil;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -39,10 +42,25 @@ public class ProtocolEngineJtt808Tests {
         private int msgId;
         @Element
         private MsgProp msgProp;
-        @AsciiString(length = "6")
-        private String deviceSn;
+        @Number(width = 8, length = "getDeviceSnLength", encoder = "encodeDeviceSn", decoder = "decodeDeviceSn", sign = Sign.Signed)
+        private long deviceSn;
         @Number(width = 16, order = ByteOrder.BigEndian)
         private int msgSn;
+
+        public int getDeviceSnLength() {
+            return 6;
+        }
+
+        public byte[] encodeDeviceSn() {
+            if (0 > deviceSn) {
+                return new byte[]{};
+            }
+            return DataPackUtil.getBCDBytes(String.format("%012d", deviceSn));
+        }
+
+        public void decodeDeviceSn(byte[] content) {
+            this.deviceSn = 999999999999L; //fake
+        }
     }
 
     @Data
@@ -53,7 +71,7 @@ public class ProtocolEngineJtt808Tests {
         private Header header;
         @Number(width = 8, length = "getMsgContentLength", encoder = "encodeMsgContent", decoder = "decodeMsgContent", sign = Sign.Signed)
         private byte[] msgContent;
-        @Number
+        @Number(width = 8)
         private byte validCode;
         @Number(width = 8)
         private int flagT = 0x7e;
@@ -87,7 +105,7 @@ public class ProtocolEngineJtt808Tests {
         Header header = new Header();
         header.setMsgId(0x0200);
         header.setMsgProp(new MsgProp().setMsgLength(content.length));
-        header.setDeviceSn("123456");
+        header.setDeviceSn(18168000002L);
         header.setMsgSn(0x0024);
 
         Jtt808Packet packet = new Jtt808Packet();
