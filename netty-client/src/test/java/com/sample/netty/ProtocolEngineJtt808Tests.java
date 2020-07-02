@@ -1,6 +1,7 @@
 package com.sample.netty;
 
 import com.github.io.protocol.annotation.ByteOrder;
+import com.github.io.protocol.annotation.Decimal;
 import com.github.io.protocol.annotation.Element;
 import com.github.io.protocol.annotation.Number;
 import com.github.io.protocol.core.ProtocolEngine;
@@ -10,6 +11,11 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
 
 /**
  * ProtocolEngineJtt808Tests
@@ -41,12 +47,12 @@ public class ProtocolEngineJtt808Tests {
         private int msgId;
         @Element
         private MsgProp msgProp;
-        @Number(width = 8, length = "getDeviceSnLength", encoder = "encodeDeviceSn", decoder = "decodeDeviceSn")
+        @Number(width = 8, length = "lengthDeviceSn", encoder = "encodeDeviceSn", decoder = "decodeDeviceSn")
         private long deviceSn;
         @Number(width = 16, order = ByteOrder.BigEndian)
         private int msgSn;
 
-        public int getDeviceSnLength() {
+        public int lengthDeviceSn() {
             return 6;
         }
 
@@ -68,26 +74,26 @@ public class ProtocolEngineJtt808Tests {
         private int flagH = 0x7e;
         @Element
         private Header header;
-        @Number(width = 8, length = "getMsgContentLength", encoder = "encodeMsgContent", decoder = "decodeMsgContent")
+        @Number(width = 8, length = "lengthMsgContent", encoder = "encodeMsgContent", decoder = "decodeMsgContent")
         private byte[] msgContent;
         @Number(width = 8)
         private byte validCode;
         @Number(width = 8)
         private int flagT = 0x7e;
 
-        public int getMsgContentLength() {
+        public int lengthMsgContent() {
             return header.getMsgProp().getMsgLength();
         }
 
         public byte[] encodeMsgContent() {
-            if (0 == getMsgContentLength()) {
+            if (0 == lengthMsgContent()) {
                 return new byte[]{};
             }
             return this.msgContent;
         }
 
         public void decodeMsgContent(byte[] content) {
-            if (0 == getMsgContentLength()) {
+            if (0 == lengthMsgContent()) {
                 this.msgContent = new byte[]{};
             } else {
                 this.msgContent = content;
@@ -95,11 +101,61 @@ public class ProtocolEngineJtt808Tests {
         }
     }
 
+    @Data
+    public static class Position {
+        // byte-8, word-16, dword-32
+        @Number(width = 32, order = ByteOrder.BigEndian)
+        private int alarmFlag = 0;
+        @Number(width = 32, order = ByteOrder.BigEndian)
+        private int carFlag = 0;
+        @Decimal(width = 32, order = ByteOrder.BigEndian, scale = 0.000001, precision = 6)
+        private double longitude;
+        @Decimal(width = 32, order = ByteOrder.BigEndian, scale = 0.000001, precision = 6)
+        private double latitude;
+        @Number(width = 16, order = ByteOrder.BigEndian)
+        private int altitude;
+        @Decimal(width = 16, order = ByteOrder.BigEndian, scale = 0.1, precision = 1)
+        private float speed;
+        @Number(width = 16, order = ByteOrder.BigEndian)
+        private int direction;
+        @Number(width = 8, length = "lengthDetectionTime", encoder = "encodeDetectionTime", decoder = "decodeDetectionTime")
+        private long detectionTime;
+
+        public int lengthDetectionTime() {
+            return 6;
+        }
+
+        public byte[] encodeDetectionTime() {
+            if (0 > detectionTime) {
+                return new byte[]{};
+            }
+            return DataPackUtil.getBCDBytes(String.format("%012d", detectionTime));
+        }
+
+        public void decodeDetectionTime(byte[] content) {
+            this.detectionTime = 200702120000L; //fake
+        }
+    }
+
+    @Data
+    public static class PositionExtra {
+        // fake
+    }
+
     @Test
     public void testEncode() throws Exception {
         ProtocolEngine engine = new ProtocolEngine();
 
-        byte[] content = ByteBufUtil.decodeHexDump("0000008000000082015898ca06ca11b000000012000018041711421801040000000630010f31010b");
+        Position position = new Position();
+        position.setLatitude(114.4036630000D);
+        position.setLongitude(30.4757560000D);
+        position.setAltitude(15);
+        position.setSpeed(0);
+        position.setDirection(0);
+        DateFormat dateFormat = new SimpleDateFormat("yyMMddHHmmss");
+        position.setDetectionTime(Long.valueOf(dateFormat.format(Date.from(Instant.now()))));
+
+        byte[] content = engine.encode(position);
 
         Header header = new Header();
         header.setMsgId(0x0200);
