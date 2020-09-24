@@ -12,6 +12,7 @@ import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.HashOperations;
@@ -48,7 +49,8 @@ public class GatherChannelHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         // 1.初始化对象
-        Date receiveTime = Date.from(Instant.now()); //接收时间
+        // 初始化接收时间
+        Date receiveTime = Date.from(Instant.now());
         IDataParser parser = this.slot.getDataParser();
         RedisTemplate<String, String> redisTemplate = this.slot.getRedisTemplate();
         HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
@@ -149,5 +151,29 @@ public class GatherChannelHandler extends ChannelInboundHandlerAdapter {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         log.error("exceptionCaught", cause);
         ctx.close();
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (evt instanceof IdleStateEvent) {
+            IdleStateEvent e = (IdleStateEvent) evt;
+            switch (e.state()) {
+                case READER_IDLE:
+                    // 读超时
+                    log.info("read timeout...");
+                    // 主动断开与客户端连接
+                    ctx.close();
+                    break;
+                case WRITER_IDLE:
+                    // 写超时
+                    log.info("write timeout...");
+                    break;
+                case ALL_IDLE:
+                    // 读/写超时
+                    log.info("read and write timeout...");
+                    break;
+                default:
+            }
+        }
     }
 }
