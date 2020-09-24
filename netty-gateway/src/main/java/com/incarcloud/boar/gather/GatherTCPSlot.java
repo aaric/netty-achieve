@@ -57,7 +57,7 @@ public class GatherTCPSlot extends GatherSlot {
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline().addLast("LoggingHandler", new LoggingHandler(LogLevel.INFO));
-                        ch.pipeline().addLast("IdleStateHandler", new IdleStateHandler(0L, 0L, 60L, TimeUnit.SECONDS));
+                        ch.pipeline().addLast("IdleStateHandler", new IdleStateHandler(30L, 0L, 0L, TimeUnit.SECONDS));
                         ch.pipeline().addLast(new GatherChannelHandler(slot));
                     }
                 });
