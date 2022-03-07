@@ -3,9 +3,11 @@
 build/
 *.iml
 *.log
-*.log.*.gz
+*.gz
+*.log.gz
 application-*.yml
 bootstrap-*.yml
 .DS_Store
+Thumbs.db
 out/
 lombok.*
