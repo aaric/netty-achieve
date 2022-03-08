@@ -1,5 +1,3 @@
-apply plugin: "org.springframework.boot"
-
 dependencies {
     implementation "org.apache.commons:commons-lang3"
 
@@ -8,4 +6,7 @@ dependencies {
     implementation "com.github.ioprotocol:com-github-ioprotocol"
 
     implementation "com.incarcloud:boar-shared:1.2-SNAPSHOT"
+
+    testImplementation "org.slf4j:slf4j-simple"
+    testImplementation "org.junit.jupiter:junit-jupiter-engine"
 }
