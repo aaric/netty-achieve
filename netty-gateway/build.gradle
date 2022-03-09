@@ -13,4 +13,12 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
 
     implementation "org.springframework.kafka:spring-kafka"
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude group: "org.junit.vintage", module: "junit-vintage-engine"
+    }
+}
+
+bootJar {
+    exclude "**/*-dev.yml"
 }

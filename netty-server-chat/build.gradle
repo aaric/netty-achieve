@@ -4,4 +4,12 @@ dependencies {
     implementation "io.netty:netty-all"
 
     implementation "org.springframework.boot:spring-boot-starter"
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude group: "org.junit.vintage", module: "junit-vintage-engine"
+    }
+}
+
+bootJar {
+    enabled false
 }

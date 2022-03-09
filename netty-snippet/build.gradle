@@ -1,0 +1,6 @@
+dependencies {
+    implementation "io.netty:netty-all"
+
+    testImplementation "org.slf4j:slf4j-simple"
+    testImplementation "org.junit.jupiter:junit-jupiter-engine"
+}

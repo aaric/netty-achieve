@@ -1,9 +1,16 @@
+pluginManagement {
+    repositories {
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+}
+
 rootProject.name = "netty-achieve"
 
 include "netty-client"
+include "netty-demo"
 include "netty-gateway"
-include "netty-samples"
 include "netty-server-chat"
 include "netty-server-http"
 include "netty-server-socket"
 include "netty-server-blank"
+include "netty-snippet"
