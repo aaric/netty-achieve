@@ -7,8 +7,8 @@ pluginManagement {
 rootProject.name = "netty-achieve"
 
 include "netty-client"
-//include "netty-gateway"
-//include "netty-samples"
+include "netty-demo"
+include "netty-gateway"
 include "netty-server-chat"
 include "netty-server-http"
 include "netty-server-socket"
