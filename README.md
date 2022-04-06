@@ -6,6 +6,6 @@
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-2.3.12-success.svg?style=flat&logo=springboot)](https://docs.spring.io/spring-boot/docs/2.3.12.RELEASE/reference/htmlsingle/)
 [![Release](https://img.shields.io/badge/Release-3.1.0-informational.svg)](https://github.com/aaric/netty-achieve/releases)
 [![CI](https://github.com/aaric/netty-achieve/actions/workflows/gradle.yml/badge.svg)](https://github.com/aaric/netty-achieve/actions/workflows/gradle.yml)
-[![Release](https://img.shields.io/badge/Release-2.0.0-blue.svg)](https://github.com/aaric/netty-achieve/releases)
+[![Release](https://img.shields.io/badge/Release-2.0.1-blue.svg)](https://github.com/aaric/netty-achieve/releases)
 
 > Netty Learning.
