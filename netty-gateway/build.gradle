@@ -3,9 +3,9 @@ apply plugin: "org.springframework.boot"
 dependencies {
     implementation "io.netty:netty-all"
 
-    implementation "com.incarcloud:boar-shared:1.2-SNAPSHOT"
+//    implementation "com.incarcloud:boar-shared:1.2-SNAPSHOT"
 //    implementation "com.incarcloud:boar-datapack-ic:1.2-SNAPSHOT"
-    implementation "com.incarcloud:boar-datapack-jtt808:1.1-SNAPSHOT"
+//    implementation "com.incarcloud:boar-datapack-jtt808:1.1-SNAPSHOT"
 
 //    implementation "org.springframework.boot:spring-boot-starter"
     implementation "org.springframework.boot:spring-boot-starter-webflux"

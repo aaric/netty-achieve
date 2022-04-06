@@ -8,7 +8,7 @@ plugins {
 
 allprojects {
     group = "com.sample"
-    version = "2.0.0-SNAPSHOT"
+    version = "2.0.1-SNAPSHOT"
 
     ext {
         // https://github.com/alibaba/spring-cloud-alibaba/wiki/版本说明#毕业版本依赖关系推荐使用

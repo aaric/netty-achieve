@@ -1,6 +1,5 @@
 package com.incarcloud.boar;
 
-import com.incarcloud.boar.datapack.DataParserManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,9 +17,9 @@ public class App {
     /**
      * 挂载`com.incarcloud.boar.datapack`包下面的解析器
      */
-    static {
-        DataParserManager.loadClassOfSamePackage();
-    }
+//    static {
+//        DataParserManager.loadClassOfSamePackage();
+//    }
 
     /**
      * Main

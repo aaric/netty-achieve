@@ -1,6 +1,5 @@
 package com.incarcloud.boar.gather;
 
-import com.incarcloud.boar.datapack.IDataParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -29,7 +28,7 @@ public abstract class GatherSlot {
     /**
      * 数据包解析器
      */
-    protected IDataParser dataParser;
+//    protected IDataParser dataParser;
 
     /**
      * Redis操作
@@ -47,7 +46,7 @@ public abstract class GatherSlot {
     private String kafkaTopic;
 
     protected GatherSlot(GatherHost host) {
-        this.host = host;
+//        this.host = host;
         this.name = String.format("%s-slot-%d",
                 host.getName(), Instant.now().toEpochMilli());
     }
@@ -61,7 +60,7 @@ public abstract class GatherSlot {
     public void setDataParser(String parser) throws Exception {
         String clazzName = String.format("%s.%s", "com.incarcloud.boar.datapack", parser);
         Class<?> clazz = Class.forName(clazzName);
-        this.dataParser = (IDataParser) clazz.newInstance();
+//        this.dataParser = (IDataParser) clazz.newInstance();
     }
 
     /**
@@ -142,9 +141,9 @@ public abstract class GatherSlot {
      *
      * @return
      */
-    public IDataParser getDataParser() {
-        return dataParser;
-    }
+//    public IDataParser getDataParser() {
+//        return dataParser;
+//    }
 
     /**
      * 获取传输协议
