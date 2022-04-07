@@ -4,10 +4,19 @@ server:
 
 # Management settings
 management:
+  endpoint:
+    health:
+      show-details: always
   endpoints:
     web:
       exposure:
         include: "*"
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  health:
+    elasticsearch:
+      enabled: false
 
 # Logging settings
 logging:
@@ -23,7 +32,11 @@ logging:
   file:
     path: ${LOGGING_FILE_PATH:./}
     name: output.log
-    max-size: ${LOGGING_FILE_MAX_SIZE:200MB}
+    max-size: ${LOGGING_FILE_MAX_SIZE:500MB}
+    max-history: ${LOGGING_FILE_MAX_HISTORY:7}
+    total-size-cap: ${LOGGING_FILE_TOTAL_SIZE:1500MB}
+  pattern:
+    rolling-file-name: "${LOG_FILE}.%d{yyyy-MM-dd}.%i.log"
 
 # Spring settings
 spring:
