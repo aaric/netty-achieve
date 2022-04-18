@@ -5,6 +5,10 @@ dependencies {
 
     implementation "com.github.ioprotocol:com-github-ioprotocol"
 
+//    implementation "org.springframework:spring-core:5.2.15.RELEASE"
+
+//    implementation "cn.hutool:hutool-core:5.7.22"
+
 //    implementation "com.incarcloud:boar-shared:1.2-SNAPSHOT"
 
     testImplementation "org.slf4j:slf4j-simple"
