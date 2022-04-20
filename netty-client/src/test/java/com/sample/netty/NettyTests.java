@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * com.sample.netty
+ * NettyTests
  *
  * @author Aaric, created on 2020-04-30T15:42.
  * @version 1.2.0-SNAPSHOT
